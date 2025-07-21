@@ -1,22 +1,26 @@
 from fastapi.testclient import TestClient
+from httpx import WSGITransport
 from main import app
 
-# Initialize TestClient using context manager for proper resource cleanup
+# Modern TestClient initialization with transport
 def test_read_root():
-    with TestClient(app) as client:
+    with TestClient(app, transport=WSGITransport(app=app)) as client:
         response = client.get("/")
         assert response.status_code == 200
         assert response.json() == {"message": "Hello World"}
 
 def test_read_item():
-    with TestClient(app) as client:
+    with TestClient(app, transport=WSGITransport(app=app)) as client:
         response = client.get("/items/42?q=test")
         assert response.status_code == 200
-        assert response.json() == {"item_id": 42, "q": "test"}
+        data = response.json()
+        assert data["item_id"] == 42
+        assert data["q"] == "test"
 
-# Optional: Add async test example if using async endpoints
-# pytest.mark.anyio
+# For async endpoints (uncomment when needed)
+# @pytest.mark.anyio
 # async def test_async_endpoint():
-#     async with AsyncTestClient(app) as client:
+#     from httpx import AsyncClient
+#     async with AsyncClient(app=app, base_url="http://test") as client:
 #         response = await client.get("/async-route")
 #         assert response.status_code == 200
