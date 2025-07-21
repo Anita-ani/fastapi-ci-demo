@@ -6,7 +6,7 @@ def test_read_root():
     with TestClient(app) as client:
         response = client.get("/")
         assert response.status_code == 200
-        assert response.json() == {"message": "Hello World and welcome to my test environment"}
+        assert response.json() == {"message": "Hello World"}
 
 def test_read_item():
     with TestClient(app) as client:
